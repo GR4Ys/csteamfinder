@@ -301,6 +301,26 @@ function setVh() {
   const vh = (tg?.viewportStableHeight || window.innerHeight);
   document.body.style.height = vh + 'px';
   document.body.style.maxHeight = vh + 'px';
+  
+  // Force stack-area to correct height
+  setTimeout(() => {
+    const navbar = document.querySelector('.navbar');
+    const swipeScreen = document.getElementById('screen-swipe');
+    if (!swipeScreen || !navbar) return;
+    const header = swipeScreen.querySelector('.swipe-header');
+    const filterBar = swipeScreen.querySelector('.filter-bar');
+    const actionBtns = swipeScreen.querySelector('.action-btns');
+    const navH = navbar.offsetHeight;
+    const headerH = header ? header.offsetHeight : 0;
+    const filterH = filterBar ? filterBar.offsetHeight : 0;
+    const btnsH = actionBtns ? actionBtns.offsetHeight : 0;
+    const stackH = vh - navH - headerH - filterH - btnsH;
+    const stackArea = document.getElementById('stack-area');
+    if (stackArea) {
+      stackArea.style.height = stackH + 'px';
+      stackArea.style.flex = 'none';
+    }
+  }, 100);
 }
 setVh();
 window.addEventListener('resize', setVh);
@@ -310,12 +330,16 @@ const COLORS = ['#1b2838','#1a2a1a','#2a1a1a','#1a1a2a','#2a2a1a'];
 const EMOJIS = ['🔫','🎯','💥','⚡','🏆','🎮','👾','🦊'];
 
 const players = [
+  { id:0, name:'negr4ys', age:23, elo:1847, lvl:7, role:'Entry', mic:true, game:'Faceit', maps:['Mirage','Inferno','Dust2'], bio:'👑 Создатель CSFinder. Ищу адекватных тиммейтов без токсика. Играю вечером по МСК.', match:true, color:'#1a1400', emoji:'👑', hs:48, kd:1.25, isAdmin:true },
   { id:1, name:'xSniper_kz', age:22, elo:2100, lvl:8, role:'AWPer', mic:true, game:'Faceit', maps:['Dust2','Inferno'], bio:'Ищу стабильную пятёрку на вечерние сессии. Не токсик, играю вдумчиво.', match:true, color:'#0f2a1a', emoji:'🎯', hs:52, kd:1.4 },
   { id:2, name:'rush_B_only', age:19, elo:1350, lvl:5, role:'Entry', mic:true, game:'Premier', maps:['Mirage','Dust2'], bio:'Агрессивный стиль, люблю открывать раунды. Нужен саппорт в пару.', match:false, color:'#2a1a0f', emoji:'💥', hs:38, kd:1.1 },
   { id:3, name:'SilentLurker', age:27, elo:1800, lvl:7, role:'Lurker', mic:false, game:'Faceit', maps:['Nuke','Ancient','Vertigo'], bio:'Calm, calculated. English is fine. Looking for serious 5-stack.', match:false, color:'#1a0f2a', emoji:'👾', hs:44, kd:1.3 },
   { id:4, name:'FlashKing_77', age:24, elo:1650, lvl:6, role:'Support', mic:true, game:'Faceit', maps:['Inferno','Overpass'], bio:'Флэши, смоки, граты — моё всё. Ищу агрессивных fragg-еров для связки.', match:true, color:'#0f1a2a', emoji:'⚡', hs:29, kd:0.95 },
   { id:5, name:'TacticalIGL', age:31, elo:2350, lvl:9, role:'IGL', mic:true, game:'Faceit', maps:['All карты'], bio:'Строю тактическую игру. Нужна команда для систематических тренировок.', match:false, color:'#1a1a0f', emoji:'🏆', hs:33, kd:1.15 },
   { id:6, name:'PeekGod', age:20, elo:1500, lvl:6, role:'Entry', mic:true, game:'Premier', maps:['Anubis','Mirage'], bio:'Пикую всё что движется. Ищу тиммейтов на вечер по МСК.', match:true, color:'#2a0f1a', emoji:'🔫', hs:45, kd:1.2 },
+  { id:7, name:'d3adshot_ua', age:21, elo:1120, lvl:4, role:'AWPer', mic:true, game:'Faceit', maps:['Dust2','Mirage'], bio:'Hardstuck 4 lvl, но аим есть. Ищу терпеливых тиммейтов для роста.', match:false, color:'#2a1020', emoji:'🦊', hs:41, kd:0.88 },
+  { id:8, name:'CT_mastermind', age:26, elo:2600, lvl:10, role:'IGL', mic:true, game:'Faceit', maps:['Nuke','Inferno','Ancient'], bio:'Level 10, ищу игроков 8+ для стабильной пятёрки. Только серьёзные.', match:false, color:'#0a1a2a', emoji:'🔱', hs:31, kd:1.35 },
+  { id:9, name:'sprayNpray_lol', age:17, elo:820, lvl:3, role:'Entry', mic:false, game:'Matchmaking', maps:['Dust2'], bio:'Только начинаю, но стараюсь. Без mic пока что.', match:false, color:'#1a2a1a', emoji:'😅', hs:22, kd:0.71 },
 ];
 
 let queue = [...players];
@@ -366,6 +390,7 @@ function buildCard(p, idx) {
     <div class="card-inner">
       <div class="card-avatar-area" style="background:${p.color};">
         <span style="font-size:72px;">${p.emoji}</span>
+        ${p.isAdmin ? '<div style="position:absolute;top:12px;right:12px;background:#f5a623;color:#000;border-radius:100px;padding:4px 10px;font-size:11px;font-weight:800;letter-spacing:0.05em;">👑 ADMIN</div>' : ''}
         <div class="stamp stamp-like" id="sl-${p.id}">ЗОВУ</div>
         <div class="stamp stamp-nope" id="sn-${p.id}">ПАС</div>
       </div>
