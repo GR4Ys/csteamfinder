@@ -19,11 +19,10 @@
     --gold: #f5a623;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-  html { height: 100%; }
-  body { height: 100%; background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; overflow: hidden; display: flex; flex-direction: column; }
+  html, body { height: 100%; height: 100dvh; background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; overflow: hidden; display: flex; flex-direction: column; }
 
   /* SCREENS */
-  .screen { display: none; flex: 1; flex-direction: column; overflow: hidden; min-height: 0; }
+  .screen { display: none; flex: 1; flex-direction: column; overflow: hidden; min-height: 0; height: 0; }
   .screen.active { display: flex; }
 
   /* NAVBAR — bottom */
@@ -47,14 +46,14 @@
   .filter-chip.active { background: var(--blue); border-color: var(--blue); color: white; }
 
   /* CARD STACK */
-  .stack-area { flex: 1; position: relative; overflow: hidden; padding: 0 16px; min-height: 0; }
-  .card { position: absolute; width: calc(100% - 32px); border-radius: 20px; background: var(--surface); border: 1px solid var(--border); overflow: hidden; cursor: grab; user-select: none; will-change: transform; touch-action: none; }
+  .stack-area { flex: 1; position: relative; overflow: hidden; padding: 0 16px; min-height: 0; display: flex; flex-direction: column; }
+  .card { position: absolute; width: calc(100% - 32px); border-radius: 20px; background: var(--surface); border: 1px solid var(--border); overflow: hidden; cursor: grab; user-select: none; will-change: transform; touch-action: none; top: 0; bottom: 0; }
   .card:active { cursor: grabbing; }
-  .card.c0 { top: 0; bottom: 4px; z-index: 3; }
-  .card.c1 { top: 10px; bottom: 0; z-index: 2; opacity: 0.7; transform: scale(0.96); }
-  .card.c2 { top: 20px; bottom: 0; z-index: 1; opacity: 0.4; transform: scale(0.92); }
+  .card.c0 { top: 0; bottom: 0; z-index: 3; }
+  .card.c1 { top: 8px; bottom: -8px; z-index: 2; opacity: 0.7; transform: scale(0.96); }
+  .card.c2 { top: 16px; bottom: -16px; z-index: 1; opacity: 0.4; transform: scale(0.92); }
 
-  .card-inner { height: 100%; display: flex; flex-direction: column; overflow-y: auto; }
+  .card-inner { position: absolute; inset: 0; display: flex; flex-direction: column; overflow-y: auto; -webkit-overflow-scrolling: touch; }
   .card-avatar-area { height: 180px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 64px; font-weight: 700; position: relative; }
   .card-body { padding: 16px; flex: 1; display: flex; flex-direction: column; gap: 10px; }
   .card-name-row { display: flex; align-items: baseline; gap: 8px; }
