@@ -26,8 +26,8 @@
   .screen.active { display: flex; }
 
   /* NAVBAR — bottom */
-  .navbar { display: flex; background: var(--surface); border-top: 1px solid var(--border); flex-shrink: 0; padding-bottom: env(safe-area-inset-bottom, 0px); }
-  .nav-btn { flex: 1; padding: 10px 4px 8px; background: none; border: none; color: var(--muted); font-size: 10px; display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; transition: color 0.2s; }
+  .navbar { display: flex; background: var(--surface); border-top: 1px solid var(--border); flex-shrink: 0; padding-bottom: max(env(safe-area-inset-bottom, 0px), 16px); }
+  .nav-btn { flex: 1; padding: 10px 4px 6px; background: none; border: none; color: var(--muted); font-size: 10px; display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; transition: color 0.2s; }
   .nav-btn svg { width: 22px; height: 22px; }
   .nav-btn.active { color: var(--blue); }
 
@@ -301,8 +301,10 @@ function setVh() {
   const vh = (tg?.viewportStableHeight || window.innerHeight);
   document.body.style.height = vh + 'px';
   document.body.style.maxHeight = vh + 'px';
-  
-  // Force stack-area to correct height
+  fixStackHeight(vh);
+}
+
+function fixStackHeight(vh) {
   setTimeout(() => {
     const navbar = document.querySelector('.navbar');
     const swipeScreen = document.getElementById('screen-swipe');
@@ -310,17 +312,20 @@ function setVh() {
     const header = swipeScreen.querySelector('.swipe-header');
     const filterBar = swipeScreen.querySelector('.filter-bar');
     const actionBtns = swipeScreen.querySelector('.action-btns');
-    const navH = navbar.offsetHeight;
-    const headerH = header ? header.offsetHeight : 0;
-    const filterH = filterBar ? filterBar.offsetHeight : 0;
-    const btnsH = actionBtns ? actionBtns.offsetHeight : 0;
-    const stackH = vh - navH - headerH - filterH - btnsH;
+    const navH = navbar.offsetHeight || 56;
+    const headerH = header ? header.offsetHeight : 56;
+    const filterH = filterBar ? filterBar.offsetHeight : 44;
+    const btnsH = actionBtns ? actionBtns.offsetHeight : 80;
+    const gap = 12;
+    const stackH = vh - navH - headerH - filterH - btnsH - gap;
     const stackArea = document.getElementById('stack-area');
-    if (stackArea) {
+    if (stackArea && stackH > 100) {
       stackArea.style.height = stackH + 'px';
+      stackArea.style.maxHeight = stackH + 'px';
       stackArea.style.flex = 'none';
+      stackArea.style.padding = '0 16px';
     }
-  }, 100);
+  }, 200);
 }
 setVh();
 window.addEventListener('resize', setVh);
