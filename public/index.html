@@ -3,154 +3,371 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>CS Steam Finder</title>
+<title>CSFinder</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <style>
-  :root {
-    --bg: #0f0f13;
-    --surface: #1a1a22;
-    --surface2: #22222e;
-    --border: rgba(255,255,255,0.08);
-    --text: #f0f0f0;
-    --muted: #888;
-    --blue: #4a9eff;
-    --green: #3ecf8e;
-    --red: #ff5a5a;
-    --gold: #f5a623;
-  }
-  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-  html, body { height: 100%; height: 100dvh; background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; overflow: hidden; display: flex; flex-direction: column; }
+:root {
+  --bg: #0d0d11;
+  --surface: #17171f;
+  --surface2: #1f1f2a;
+  --border: rgba(255,255,255,0.07);
+  --text: #f0f0f0;
+  --muted: #777;
+  --blue: #4a9eff;
+  --green: #3ecf8e;
+  --red: #ff5a5a;
+  --gold: #f5a623;
+  --purple: #a855f7;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+html, body {
+  height: 100%; height: 100dvh;
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
 
-  /* SCREENS */
-  .screen { display: none; flex: 1; flex-direction: column; overflow: hidden; min-height: 0; height: 0; }
-  .screen.active { display: flex; }
+/* SCREENS */
+.screen { display: none; flex: 1; flex-direction: column; overflow: hidden; min-height: 0; height: 0; }
+.screen.active { display: flex; }
 
-  /* NAVBAR — bottom */
-  .navbar { display: flex; background: var(--surface); border-top: 1px solid var(--border); flex-shrink: 0; padding-bottom: max(env(safe-area-inset-bottom, 0px), 16px); }
-  .nav-btn { flex: 1; padding: 10px 4px 6px; background: none; border: none; color: var(--muted); font-size: 10px; display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; transition: color 0.2s; }
-  .nav-btn svg { width: 22px; height: 22px; }
-  .nav-btn.active { color: var(--blue); }
+/* NAVBAR */
+.navbar {
+  display: flex;
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  flex-shrink: 0;
+  padding-bottom: max(env(safe-area-inset-bottom, 0px), 16px);
+}
+.nav-btn {
+  flex: 1; padding: 10px 4px 6px;
+  background: none; border: none;
+  color: var(--muted); font-size: 10px;
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+  cursor: pointer; transition: color 0.2s;
+}
+.nav-btn svg { width: 22px; height: 22px; }
+.nav-btn.active { color: var(--blue); }
 
-  /* SWIPE SCREEN */
-  #screen-swipe { position: relative; }
-  .swipe-header { padding: 14px 16px 10px; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
-  .app-title { font-size: 18px; font-weight: 700; letter-spacing: -0.5px; }
-  .app-title span { color: var(--blue); }
-  .online-pill { background: var(--surface2); border: 1px solid var(--border); border-radius: 100px; padding: 4px 10px; font-size: 11px; color: var(--green); display: flex; align-items: center; gap: 5px; }
-  .online-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); }
+/* HEADER */
+.swipe-header {
+  padding: 12px 16px 8px;
+  display: flex; align-items: center; justify-content: space-between;
+  flex-shrink: 0;
+}
+.app-logo { font-size: 20px; font-weight: 800; letter-spacing: -0.5px; }
+.app-logo span { color: var(--blue); }
+.online-pill {
+  background: var(--surface2); border: 1px solid var(--border);
+  border-radius: 100px; padding: 4px 10px; font-size: 11px;
+  color: var(--green); display: flex; align-items: center; gap: 5px;
+}
+.online-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); }
 
-  /* FILTER BAR */
-  .filter-bar { display: flex; gap: 6px; padding: 0 16px 10px; overflow-x: auto; flex-shrink: 0; scrollbar-width: none; }
-  .filter-bar::-webkit-scrollbar { display: none; }
-  .filter-chip { background: var(--surface2); border: 1px solid var(--border); border-radius: 100px; padding: 5px 12px; font-size: 12px; color: var(--muted); white-space: nowrap; cursor: pointer; transition: all 0.2s; }
-  .filter-chip.active { background: var(--blue); border-color: var(--blue); color: white; }
+/* FILTER BAR - CS2 specific */
+.filter-bar {
+  display: flex; gap: 6px;
+  padding: 0 16px 10px;
+  overflow-x: auto; flex-shrink: 0;
+  scrollbar-width: none;
+}
+.filter-bar::-webkit-scrollbar { display: none; }
+.filter-chip {
+  display: flex; align-items: center; gap: 5px;
+  background: var(--surface2); border: 1px solid var(--border);
+  border-radius: 100px; padding: 6px 12px;
+  font-size: 12px; color: var(--muted);
+  white-space: nowrap; cursor: pointer; transition: all 0.15s;
+  flex-shrink: 0;
+}
+.filter-chip.active { background: var(--blue); border-color: var(--blue); color: white; }
+.filter-chip .chip-icon { font-size: 14px; }
 
-  /* CARD STACK */
-  .stack-area { flex: 1; position: relative; overflow: hidden; padding: 0 16px 8px; min-height: 0; display: flex; flex-direction: column; }
-  .card { position: absolute; width: calc(100% - 32px); border-radius: 20px; background: var(--surface); border: 1px solid var(--border); overflow: hidden; cursor: grab; user-select: none; will-change: transform; touch-action: none; top: 0; bottom: 0; }
-  .card:active { cursor: grabbing; }
-  .card.c0 { top: 0; bottom: 6px; z-index: 3; }
-  .card.c1 { top: 8px; bottom: -8px; z-index: 2; opacity: 0.7; transform: scale(0.96); }
-  .card.c2 { top: 16px; bottom: -16px; z-index: 1; opacity: 0.4; transform: scale(0.92); }
+/* STACK AREA */
+.stack-area {
+  flex: 1; position: relative;
+  overflow: hidden;
+  padding: 0 12px 8px;
+  min-height: 0;
+  touch-action: none;
+}
 
-  .card-inner { position: absolute; inset: 0; display: flex; flex-direction: column; overflow-y: auto; -webkit-overflow-scrolling: touch; }
-  .card-body { padding: 16px; flex: 1; display: flex; flex-direction: column; gap: 10px; min-height: 0; }
-  .card-bio { font-size: 13px; color: var(--muted); line-height: 1.6; }
-  .card-avatar-area { height: 200px; min-height: 0; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 64px; font-weight: 700; position: relative; }
-  .card-name-row { display: flex; align-items: baseline; gap: 8px; }
-  .card-name { font-size: 22px; font-weight: 700; }
-  .card-age { font-size: 15px; color: var(--muted); }
-  .elo-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-  .elo-badge { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 5px 10px; font-size: 13px; font-weight: 600; color: var(--gold); }
-  .game-badge { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 5px 10px; font-size: 13px; color: var(--muted); }
-  .tags { display: flex; flex-wrap: wrap; gap: 6px; }
-  .tag { border-radius: 100px; padding: 4px 10px; font-size: 12px; font-weight: 500; }
-  .tag-role { background: rgba(74,158,255,0.15); color: var(--blue); }
-  .tag-mic { background: rgba(62,207,142,0.15); color: var(--green); }
-  .tag-nomic { background: rgba(255,90,90,0.1); color: var(--red); }
-  .tag-map { background: var(--surface2); color: var(--muted); border: 1px solid var(--border); }
+/* TINDER-STYLE CARD */
+.card {
+  position: absolute;
+  width: calc(100% - 24px);
+  top: 0; bottom: 0;
+  border-radius: 20px;
+  overflow: hidden;
+  cursor: grab;
+  user-select: none;
+  will-change: transform;
+  touch-action: none;
+}
+.card:active { cursor: grabbing; }
+.card.c0 { z-index: 3; }
+.card.c1 { z-index: 2; transform: scale(0.95) translateY(12px); opacity: 0.8; }
+.card.c2 { z-index: 1; transform: scale(0.90) translateY(24px); opacity: 0.5; }
 
-  /* PREMIUM STATS */
-  .premium-blur { filter: blur(4px); pointer-events: none; user-select: none; }
-  .premium-overlay { position: relative; }
-  .premium-overlay::after { content: ''; position: absolute; inset: 0; background: rgba(15,15,19,0.6); border-radius: 10px; }
-  .premium-label { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); z-index: 2; background: var(--gold); color: #000; border-radius: 100px; padding: 5px 14px; font-size: 12px; font-weight: 700; white-space: nowrap; }
-  .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-  .stat-box { background: var(--surface2); border-radius: 10px; padding: 10px; border: 1px solid var(--border); }
-  .stat-label { font-size: 10px; color: var(--muted); margin-bottom: 3px; }
-  .stat-val { font-size: 18px; font-weight: 700; }
+/* CARD BACKGROUND - big emoji/avatar */
+.card-bg {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 120px;
+}
+.card-bg-gradient {
+  position: absolute; inset: 0;
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    transparent 35%,
+    rgba(13,13,17,0.6) 55%,
+    rgba(13,13,17,0.95) 75%,
+    rgba(13,13,17,1) 100%
+  );
+}
 
-  /* STAMP */
-  .stamp { position: absolute; top: 24px; border-radius: 8px; padding: 8px 16px; font-size: 22px; font-weight: 800; opacity: 0; pointer-events: none; border: 3px solid; letter-spacing: 1px; z-index: 10; }
-  .stamp-like { left: 16px; color: var(--green); border-color: var(--green); transform: rotate(-12deg); }
-  .stamp-nope { right: 16px; color: var(--red); border-color: var(--red); transform: rotate(12deg); }
+/* CARD INFO - overlay at bottom */
+.card-info {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  padding: 16px;
+  display: flex; flex-direction: column; gap: 8px;
+}
+.card-name-row {
+  display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+}
+.card-name { font-size: 24px; font-weight: 800; }
+.card-age { font-size: 16px; color: rgba(255,255,255,0.6); font-weight: 400; }
+.admin-badge {
+  background: var(--gold); color: #000;
+  border-radius: 100px; padding: 3px 10px;
+  font-size: 11px; font-weight: 800;
+}
+.card-elo-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.elo-badge {
+  background: rgba(245,166,35,0.2); border: 1px solid rgba(245,166,35,0.4);
+  border-radius: 8px; padding: 4px 10px;
+  font-size: 13px; font-weight: 700; color: var(--gold);
+  display: flex; align-items: center; gap: 5px;
+}
+.platform-badge {
+  background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 8px; padding: 4px 10px;
+  font-size: 13px; color: rgba(255,255,255,0.7);
+}
+.card-tags { display: flex; flex-wrap: wrap; gap: 5px; }
+.tag {
+  border-radius: 100px; padding: 4px 10px;
+  font-size: 12px; font-weight: 500;
+  display: flex; align-items: center; gap: 4px;
+}
+.tag-role { background: rgba(74,158,255,0.2); color: #7ab8ff; border: 1px solid rgba(74,158,255,0.3); }
+.tag-mic { background: rgba(62,207,142,0.2); color: #6ee7b7; border: 1px solid rgba(62,207,142,0.3); }
+.tag-nomic { background: rgba(255,90,90,0.15); color: #fca5a5; border: 1px solid rgba(255,90,90,0.2); }
+.tag-map { background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.6); border: 1px solid rgba(255,255,255,0.1); }
+.tag-time { background: rgba(168,85,247,0.2); color: #d8b4fe; border: 1px solid rgba(168,85,247,0.3); }
+.card-bio { font-size: 13px; color: rgba(255,255,255,0.65); line-height: 1.5; }
 
-  /* ACTION BUTTONS */
-  .action-btns { display: flex; justify-content: center; align-items: center; gap: 16px; padding: 8px 0 10px; flex-shrink: 0; }
-  .btn-action { border-radius: 50%; border: 2px solid var(--border); background: var(--surface); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: transform 0.1s, background 0.2s; }
-  .btn-action:active { transform: scale(0.9); }
-  .btn-nope { width: 56px; height: 56px; color: var(--red); border-color: rgba(255,90,90,0.3); }
-  .btn-like { width: 68px; height: 68px; color: var(--green); border-color: rgba(62,207,142,0.3); }
-  .btn-nope:hover { background: rgba(255,90,90,0.1); }
-  .btn-like:hover { background: rgba(62,207,142,0.1); }
+/* PREMIUM STATS on card */
+.card-stats {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px;
+  margin-top: 2px;
+}
+.stat-item {
+  background: rgba(255,255,255,0.07);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 10px; padding: 8px;
+  text-align: center;
+}
+.stat-val { font-size: 16px; font-weight: 700; }
+.stat-lbl { font-size: 10px; color: var(--muted); margin-top: 1px; }
+.stat-locked { filter: blur(5px); pointer-events: none; }
+.premium-lock {
+  position: relative;
+}
+.premium-lock-badge {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(13,13,17,0.5);
+  border-radius: 10px;
+  font-size: 11px; font-weight: 700;
+  color: var(--gold);
+  gap: 4px;
+}
 
-  /* MATCH POPUP */
-  .match-popup { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 100; flex-direction: column; align-items: center; justify-content: center; gap: 20px; text-align: center; padding: 32px; }
-  .match-popup.show { display: flex; }
-  .match-title { font-size: 28px; font-weight: 800; color: var(--green); }
-  .match-sub { font-size: 15px; color: var(--muted); }
-  .match-avatars { display: flex; gap: 16px; }
-  .match-av { width: 72px; height: 72px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: 800; border: 3px solid var(--green); }
-  .btn-primary { background: var(--green); color: #000; border: none; border-radius: 100px; padding: 14px 32px; font-size: 15px; font-weight: 700; cursor: pointer; }
-  .btn-secondary { background: transparent; color: var(--muted); border: 1px solid var(--border); border-radius: 100px; padding: 12px 28px; font-size: 14px; cursor: pointer; }
+/* STAMPS */
+.stamp {
+  position: absolute; top: 28px;
+  border-radius: 10px; padding: 8px 18px;
+  font-size: 24px; font-weight: 900;
+  opacity: 0; pointer-events: none;
+  border: 3px solid; letter-spacing: 2px;
+  z-index: 10; text-transform: uppercase;
+}
+.stamp-like { left: 20px; color: var(--green); border-color: var(--green); transform: rotate(-15deg); }
+.stamp-nope { right: 20px; color: var(--red); border-color: var(--red); transform: rotate(15deg); }
 
-  /* EMPTY */
-  .empty-state { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; color: var(--muted); }
-  .empty-icon { font-size: 48px; }
-  .empty-text { font-size: 15px; }
-  .btn-reset { margin-top: 8px; background: var(--surface2); border: 1px solid var(--border); color: var(--text); border-radius: 100px; padding: 10px 24px; font-size: 14px; cursor: pointer; }
+/* ACTION BUTTONS */
+.action-btns {
+  display: flex; justify-content: center; align-items: center;
+  gap: 20px; padding: 8px 0 10px; flex-shrink: 0;
+}
+.btn-action {
+  border-radius: 50%; border: 2px solid;
+  background: var(--surface);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; transition: transform 0.1s, background 0.15s;
+}
+.btn-action:active { transform: scale(0.88); }
+.btn-nope { width: 58px; height: 58px; color: var(--red); border-color: rgba(255,90,90,0.35); }
+.btn-super { width: 46px; height: 46px; color: var(--blue); border-color: rgba(74,158,255,0.35); }
+.btn-like { width: 68px; height: 68px; color: var(--green); border-color: rgba(62,207,142,0.35); }
+.btn-nope:active { background: rgba(255,90,90,0.15); }
+.btn-like:active { background: rgba(62,207,142,0.15); }
+.btn-super:active { background: rgba(74,158,255,0.15); }
 
-  /* MATCHES SCREEN */
-  #screen-matches { overflow: hidden; }
-  .screen-header { padding: 16px; font-size: 18px; font-weight: 700; flex-shrink: 0; }
-  .matches-list { flex: 1; overflow-y: auto; padding: 0 16px 16px; display: flex; flex-direction: column; gap: 10px; }
-  .match-item { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 14px; display: flex; align-items: center; gap: 12px; }
-  .match-item-av { width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 700; flex-shrink: 0; border: 2px solid var(--green); }
-  .match-item-info { flex: 1; }
-  .match-item-name { font-size: 15px; font-weight: 600; }
-  .match-item-sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
-  .btn-msg { background: var(--blue); color: white; border: none; border-radius: 100px; padding: 8px 16px; font-size: 13px; font-weight: 600; cursor: pointer; }
+/* MATCH POPUP */
+.match-popup {
+  display: none; position: fixed; inset: 0;
+  background: rgba(0,0,0,0.88); z-index: 100;
+  flex-direction: column; align-items: center; justify-content: center;
+  gap: 18px; text-align: center; padding: 32px;
+}
+.match-popup.show { display: flex; }
+.match-title { font-size: 30px; font-weight: 900; color: var(--green); }
+.match-sub { font-size: 15px; color: rgba(255,255,255,0.5); }
+.match-avatars { display: flex; gap: 16px; align-items: center; }
+.match-av {
+  width: 80px; height: 80px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 36px; border: 3px solid var(--green);
+  background: var(--surface2);
+}
+.match-heart { font-size: 28px; }
+.btn-primary {
+  background: var(--green); color: #000; border: none;
+  border-radius: 100px; padding: 14px 36px;
+  font-size: 15px; font-weight: 800; cursor: pointer; width: 100%;
+}
+.btn-secondary {
+  background: transparent; color: rgba(255,255,255,0.4);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 100px; padding: 12px 28px;
+  font-size: 14px; cursor: pointer; width: 100%;
+}
 
-  /* PROFILE SCREEN */
-  #screen-profile { overflow-y: auto; }
-  .profile-content { padding: 16px; display: flex; flex-direction: column; gap: 16px; }
-  .profile-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 20px; display: flex; flex-direction: column; align-items: center; gap: 12px; text-align: center; }
-  .profile-av { width: 80px; height: 80px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 32px; font-weight: 800; border: 3px solid var(--blue); }
-  .profile-name { font-size: 20px; font-weight: 700; }
-  .profile-sub { font-size: 13px; color: var(--muted); }
-  .steam-btn { display: flex; align-items: center; gap: 8px; background: #1b2838; border: 1px solid #4a9eff44; border-radius: 100px; padding: 10px 20px; font-size: 14px; color: var(--blue); cursor: pointer; font-weight: 600; }
-  .section-title { font-size: 13px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px; }
-  .form-field { display: flex; flex-direction: column; gap: 6px; }
-  .form-label { font-size: 13px; color: var(--muted); }
-  select, textarea { background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; color: var(--text); padding: 10px 12px; font-size: 14px; width: 100%; outline: none; }
-  textarea { resize: none; height: 80px; font-family: inherit; }
-  .toggle-row { display: flex; align-items: center; justify-content: space-between; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 12px 16px; }
-  .toggle-label { font-size: 14px; }
-  .toggle { width: 44px; height: 24px; border-radius: 100px; background: var(--surface2); border: none; cursor: pointer; position: relative; transition: background 0.2s; }
-  .toggle.on { background: var(--green); }
-  .toggle::after { content:''; position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; border-radius: 50%; background: white; transition: left 0.2s; }
-  .toggle.on::after { left: 23px; }
-  .save-btn { background: var(--blue); color: white; border: none; border-radius: 14px; padding: 14px; font-size: 15px; font-weight: 700; cursor: pointer; width: 100%; }
+/* EMPTY */
+.empty-state {
+  flex: 1; display: none;
+  flex-direction: column; align-items: center; justify-content: center;
+  gap: 14px; color: var(--muted);
+}
+.empty-state.show { display: flex; }
+.empty-icon { font-size: 56px; }
+.empty-text { font-size: 15px; }
+.btn-reset {
+  background: var(--surface2); border: 1px solid var(--border);
+  color: var(--text); border-radius: 100px;
+  padding: 10px 24px; font-size: 14px; cursor: pointer; margin-top: 4px;
+}
 
-  /* PREMIUM SCREEN */
-  .premium-banner { background: linear-gradient(135deg, #1a1a22 0%, #22222e 100%); border: 1px solid var(--gold); border-radius: 16px; padding: 20px; display: flex; flex-direction: column; gap: 12px; }
-  .premium-title { font-size: 18px; font-weight: 700; color: var(--gold); }
-  .premium-feature { display: flex; align-items: center; gap: 10px; font-size: 14px; color: var(--muted); }
-  .premium-feature svg { color: var(--gold); flex-shrink: 0; }
-  .price-row { display: flex; align-items: baseline; gap: 6px; margin-top: 4px; }
-  .price-big { font-size: 28px; font-weight: 800; }
-  .price-sub { font-size: 13px; color: var(--muted); }
-  .premium-btn { background: var(--gold); color: #000; border: none; border-radius: 14px; padding: 14px; font-size: 15px; font-weight: 800; cursor: pointer; width: 100%; }
+/* MATCHES SCREEN */
+.screen-header { padding: 16px; font-size: 20px; font-weight: 800; flex-shrink: 0; }
+.matches-list { flex: 1; overflow-y: auto; padding: 0 16px 16px; display: flex; flex-direction: column; gap: 10px; }
+.match-item {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 16px; padding: 14px;
+  display: flex; align-items: center; gap: 12px;
+}
+.match-item-av {
+  width: 52px; height: 52px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 24px; flex-shrink: 0;
+  border: 2px solid var(--green); background: var(--surface2);
+}
+.match-item-info { flex: 1; }
+.match-item-name { font-size: 15px; font-weight: 700; }
+.match-item-sub { font-size: 12px; color: var(--muted); margin-top: 3px; }
+.btn-msg {
+  background: var(--blue); color: white; border: none;
+  border-radius: 100px; padding: 8px 16px;
+  font-size: 13px; font-weight: 700; cursor: pointer;
+}
+
+/* PROFILE SCREEN */
+#screen-profile { overflow-y: auto; }
+.profile-content { padding: 16px; display: flex; flex-direction: column; gap: 14px; }
+.profile-hero {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 20px; padding: 24px;
+  display: flex; flex-direction: column; align-items: center; gap: 12px; text-align: center;
+}
+.profile-emoji { font-size: 56px; }
+.profile-name { font-size: 20px; font-weight: 800; }
+.profile-sub { font-size: 13px; color: var(--muted); }
+.steam-btn {
+  display: flex; align-items: center; gap: 8px;
+  background: #1b2838; border: 1px solid rgba(74,158,255,0.3);
+  border-radius: 100px; padding: 10px 20px;
+  font-size: 14px; color: var(--blue); cursor: pointer; font-weight: 700;
+}
+.form-section { display: flex; flex-direction: column; gap: 8px; }
+.form-label { font-size: 12px; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+.chips-row { display: flex; flex-wrap: wrap; gap: 6px; }
+.choice-chip {
+  background: var(--surface2); border: 1px solid var(--border);
+  border-radius: 100px; padding: 7px 14px;
+  font-size: 13px; color: var(--muted); cursor: pointer; transition: all 0.15s;
+}
+.choice-chip.selected { background: var(--blue); border-color: var(--blue); color: white; }
+textarea {
+  background: var(--surface2); border: 1px solid var(--border);
+  border-radius: 12px; color: var(--text);
+  padding: 12px; font-size: 14px; width: 100%; outline: none;
+  resize: none; height: 80px; font-family: inherit;
+}
+.toggle-row {
+  display: flex; align-items: center; justify-content: space-between;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 14px; padding: 14px 16px;
+}
+.toggle-label { font-size: 14px; font-weight: 500; }
+.toggle {
+  width: 46px; height: 26px; border-radius: 100px;
+  background: var(--surface2); border: none; cursor: pointer;
+  position: relative; transition: background 0.2s; flex-shrink: 0;
+}
+.toggle.on { background: var(--green); }
+.toggle::after {
+  content:''; position: absolute; top: 3px; left: 3px;
+  width: 20px; height: 20px; border-radius: 50%;
+  background: white; transition: left 0.2s;
+}
+.toggle.on::after { left: 23px; }
+.save-btn {
+  background: var(--blue); color: white; border: none;
+  border-radius: 14px; padding: 15px;
+  font-size: 15px; font-weight: 800; cursor: pointer; width: 100%;
+}
+.premium-card {
+  background: var(--surface);
+  border: 1px solid rgba(245,166,35,0.35);
+  border-radius: 20px; padding: 18px;
+  display: flex; flex-direction: column; gap: 12px;
+}
+.premium-card-title { font-size: 16px; font-weight: 800; color: var(--gold); display: flex; align-items: center; gap: 8px; }
+.premium-features { display: flex; flex-direction: column; gap: 7px; }
+.premium-feat { font-size: 13px; color: rgba(255,255,255,0.6); display: flex; align-items: center; gap: 8px; }
+.premium-feat::before { content: '✓'; color: var(--gold); font-weight: 800; }
+.premium-btn {
+  background: var(--gold); color: #000; border: none;
+  border-radius: 12px; padding: 13px;
+  font-size: 15px; font-weight: 800; cursor: pointer;
+}
 </style>
 </head>
 <body>
@@ -158,23 +375,25 @@
 <!-- SWIPE SCREEN -->
 <div class="screen active" id="screen-swipe">
   <div class="swipe-header">
-    <div class="app-title">CS<span>Finder</span></div>
+    <div class="app-logo">CS<span>Finder</span></div>
     <div class="online-pill"><div class="online-dot"></div> 247 онлайн</div>
   </div>
 
   <div class="filter-bar">
-    <div class="filter-chip active" data-filter="all">Все</div>
-    <div class="filter-chip" data-filter="Faceit">Faceit</div>
-    <div class="filter-chip" data-filter="Premier">Premier</div>
-    <div class="filter-chip" data-filter="mic">С mic</div>
-    <div class="filter-chip" data-filter="AWPer">AWPer</div>
-    <div class="filter-chip" data-filter="Entry">Entry</div>
-    <div class="filter-chip" data-filter="Support">Support</div>
-    <div class="filter-chip" data-filter="IGL">IGL</div>
+    <div class="filter-chip active" data-filter="all"><span class="chip-icon">🎮</span> Все</div>
+    <div class="filter-chip" data-filter="Faceit"><span class="chip-icon">⚡</span> Faceit</div>
+    <div class="filter-chip" data-filter="Premier"><span class="chip-icon">🏆</span> Premier</div>
+    <div class="filter-chip" data-filter="mic"><span class="chip-icon">🎤</span> С mic</div>
+    <div class="filter-chip" data-filter="AWPer"><span class="chip-icon">🔭</span> AWPer</div>
+    <div class="filter-chip" data-filter="Entry"><span class="chip-icon">💥</span> Entry</div>
+    <div class="filter-chip" data-filter="Support"><span class="chip-icon">🛡️</span> Support</div>
+    <div class="filter-chip" data-filter="IGL"><span class="chip-icon">🧠</span> IGL</div>
+    <div class="filter-chip" data-filter="Lurker"><span class="chip-icon">👻</span> Lurker</div>
+    <div class="filter-chip" data-filter="evening"><span class="chip-icon">🌙</span> Вечер МСК</div>
   </div>
 
-  <div class="stack-area" id="stack-area" ontouchmove="event.preventDefault()" style="touch-action:none;">
-    <div class="empty-state" id="empty-state" style="display:none;">
+  <div class="stack-area" id="stack-area" ontouchmove="event.preventDefault()">
+    <div class="empty-state" id="empty-state">
       <div class="empty-icon">🎯</div>
       <div class="empty-text">Все игроки просмотрены</div>
       <button class="btn-reset" onclick="resetDeck()">Начать заново</button>
@@ -185,97 +404,128 @@
     <button class="btn-action btn-nope" onclick="swipeLeft()" aria-label="Пропустить">
       <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12"/></svg>
     </button>
-    <button class="btn-action btn-like" onclick="swipeRight()" aria-label="Пригласить">
-      <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+    <button class="btn-action btn-super" onclick="superLike()" aria-label="Супер">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+    </button>
+    <button class="btn-action btn-like" onclick="swipeRight()" aria-label="Позвать">
+      <svg width="30" height="30" viewBox="0 0 24 24" fill="currentColor"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
     </button>
   </div>
 </div>
 
 <!-- MATCHES SCREEN -->
 <div class="screen" id="screen-matches">
-  <div class="screen-header">Мои матчи</div>
+  <div class="screen-header">Матчи 💚</div>
   <div class="matches-list" id="matches-list">
-    <div style="color:var(--muted);font-size:14px;text-align:center;padding:40px 0;">Пока нет матчей — свайпай вправо!</div>
+    <div style="color:var(--muted);font-size:14px;text-align:center;padding:40px 0;">Свайпай вправо чтобы найти тиммейта!</div>
   </div>
 </div>
 
 <!-- PROFILE SCREEN -->
 <div class="screen" id="screen-profile">
   <div class="profile-content">
-    <div class="screen-header" style="padding:16px 0 0;">Мой профиль</div>
+    <div class="screen-header" style="padding:16px 0 0;">Профиль</div>
 
-    <div class="profile-card">
-      <div class="profile-av" style="background:#1b2838;">🎮</div>
-      <div>
-        <div class="profile-name" id="profile-name">Гость</div>
-        <div class="profile-sub">Подключи Steam для автозаполнения</div>
-      </div>
+    <div class="profile-hero">
+      <div class="profile-emoji">🎮</div>
+      <div class="profile-name">Гость</div>
+      <div class="profile-sub">Подключи Steam чтобы данные подтянулись автоматически</div>
       <button class="steam-btn" onclick="connectSteam()">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12c0 4.24 2.65 7.86 6.39 9.29L12 12h3c0-1.66 1.34-3 3-3s3 1.34 3 3-1.34 3-3 3c-.35 0-.68-.07-1-.18l-3.5 3.5C14.16 21.93 13.1 22 12 22c-5.52 0-10-4.48-10-10S6.48 2 12 2z"/></svg>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M11.979 0C5.678 0 .511 4.86.022 11.037l6.432 2.658c.545-.371 1.203-.59 1.912-.59.063 0 .125.004.188.006l2.861-4.142V8.91c0-2.495 2.028-4.524 4.524-4.524 2.494 0 4.524 2.031 4.524 4.527s-2.03 4.525-4.524 4.525h-.105l-4.076 2.911c0 .052.004.105.004.159 0 1.875-1.515 3.396-3.39 3.396-1.635 0-3.016-1.173-3.331-2.727L.436 15.27C1.862 20.307 6.486 24 11.979 24c6.627 0 11.999-5.373 11.999-12S18.605 0 11.979 0z"/></svg>
         Войти через Steam
       </button>
     </div>
 
-    <div class="form-field">
-      <div class="form-label">Роль в игре</div>
-      <select id="p-role">
-        <option>Entry fragger</option>
-        <option>AWPer</option>
-        <option>Support</option>
-        <option>IGL</option>
-        <option>Lurker</option>
-      </select>
-    </div>
-
-    <div class="form-field">
-      <div class="form-label">Платформа</div>
-      <select id="p-game">
-        <option>Faceit</option>
-        <option>Premier</option>
-        <option>Matchmaking</option>
-      </select>
-    </div>
-
-    <div class="form-field">
-      <div class="form-label">О себе</div>
-      <textarea id="p-bio" placeholder="Ищу адекватных тиммейтов, играю вечером по МСК..."></textarea>
-    </div>
-
-    <div class="toggle-row">
-      <div class="toggle-label">Есть микрофон</div>
-      <button class="toggle on" id="tog-mic" onclick="this.classList.toggle('on')"></button>
-    </div>
-
-    <div class="toggle-row">
-      <div class="toggle-label">Показывать онлайн</div>
-      <button class="toggle on" id="tog-online" onclick="this.classList.toggle('on')"></button>
-    </div>
-
-    <div style="background:var(--surface);border:1px solid rgba(245,166,35,0.3);border-radius:16px;padding:16px;">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
-        <div style="font-size:15px;font-weight:700;color:var(--gold);">⭐ Premium</div>
-        <div style="font-size:13px;color:var(--muted);">199 ₽/мес</div>
+    <div class="form-section">
+      <div class="form-label">Роль</div>
+      <div class="chips-row">
+        <div class="choice-chip selected">Entry</div>
+        <div class="choice-chip">AWPer</div>
+        <div class="choice-chip">Support</div>
+        <div class="choice-chip">IGL</div>
+        <div class="choice-chip">Lurker</div>
+        <div class="choice-chip">Flex</div>
       </div>
-      <div style="font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:12px;">Полная статистика — HS%, лучшие карты, K/D по ролям, история матчей</div>
-      <button class="premium-btn" onclick="showPremium()">Попробовать бесплатно</button>
     </div>
 
-    <button class="save-btn" onclick="saveProfile()">Сохранить профиль</button>
+    <div class="form-section">
+      <div class="form-label">Платформа</div>
+      <div class="chips-row">
+        <div class="choice-chip selected">Faceit</div>
+        <div class="choice-chip">Premier</div>
+        <div class="choice-chip">Matchmaking</div>
+      </div>
+    </div>
+
+    <div class="form-section">
+      <div class="form-label">Когда играешь</div>
+      <div class="chips-row">
+        <div class="choice-chip">Утро</div>
+        <div class="choice-chip selected">Вечер МСК</div>
+        <div class="choice-chip">Ночь</div>
+        <div class="choice-chip">Выходные</div>
+      </div>
+    </div>
+
+    <div class="form-section">
+      <div class="form-label">Любимые карты</div>
+      <div class="chips-row">
+        <div class="choice-chip selected">Mirage</div>
+        <div class="choice-chip selected">Inferno</div>
+        <div class="choice-chip">Dust2</div>
+        <div class="choice-chip">Nuke</div>
+        <div class="choice-chip">Ancient</div>
+        <div class="choice-chip">Anubis</div>
+        <div class="choice-chip">Vertigo</div>
+        <div class="choice-chip">Overpass</div>
+      </div>
+    </div>
+
+    <div class="form-section">
+      <div class="form-label">О себе</div>
+      <textarea placeholder="Ищу адекватных тиммейтов без токсика..."></textarea>
+    </div>
+
+    <div class="toggle-row">
+      <div class="toggle-label">🎤 Есть микрофон</div>
+      <button class="toggle on" onclick="this.classList.toggle('on')"></button>
+    </div>
+    <div class="toggle-row">
+      <div class="toggle-label">👁️ Показывать онлайн</div>
+      <button class="toggle on" onclick="this.classList.toggle('on')"></button>
+    </div>
+
+    <div class="premium-card">
+      <div class="premium-card-title">⭐ Premium</div>
+      <div class="premium-features">
+        <div class="premium-feat">Полная статистика — HS%, K/D, карты</div>
+        <div class="premium-feat">Приоритет в поиске</div>
+        <div class="premium-feat">Безлимит лайков</div>
+        <div class="premium-feat">Бейдж Premium на профиле</div>
+      </div>
+      <div style="display:flex;align-items:baseline;gap:6px;">
+        <span style="font-size:24px;font-weight:800;">199 ₽</span>
+        <span style="font-size:13px;color:var(--muted);">в месяц</span>
+      </div>
+      <button class="premium-btn">Попробовать бесплатно 7 дней</button>
+    </div>
+
+    <button class="save-btn">Сохранить профиль</button>
     <div style="height:20px;"></div>
   </div>
 </div>
 
 <!-- NAVBAR -->
-<div class="navbar" id="navbar">
-  <button class="nav-btn active" onclick="showScreen('swipe',this)" id="nav-swipe">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+<div class="navbar">
+  <button class="nav-btn active" onclick="showScreen('swipe',this)">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
     Поиск
   </button>
-  <button class="nav-btn" onclick="showScreen('matches',this)" id="nav-matches">
+  <button class="nav-btn" onclick="showScreen('matches',this)">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
     Матчи
   </button>
-  <button class="nav-btn" onclick="showScreen('profile',this)" id="nav-profile">
+  <button class="nav-btn" onclick="showScreen('profile',this)">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
     Профиль
   </button>
@@ -283,103 +533,102 @@
 
 <!-- MATCH POPUP -->
 <div class="match-popup" id="match-popup">
-  <div class="match-title">Взаимный матч!</div>
+  <div class="match-title">Взаимный матч! 🎯</div>
   <div class="match-avatars">
-    <div class="match-av" style="background:#1b2838;font-size:28px;">🎮</div>
-    <div class="match-av" id="popup-av" style="font-size:28px;"></div>
+    <div class="match-av">🎮</div>
+    <div class="match-heart">💚</div>
+    <div class="match-av" id="popup-av"></div>
   </div>
-  <div class="match-sub" id="popup-sub">Вы подходите друг другу</div>
+  <div class="match-sub" id="popup-sub"></div>
   <button class="btn-primary" onclick="closeMatch()">Написать тиммейту</button>
   <button class="btn-secondary" onclick="closeMatch()">Продолжить поиск</button>
 </div>
 
 <script>
 const tg = window.Telegram?.WebApp;
-if (tg) { tg.expand(); tg.setHeaderColor('#0f0f13'); tg.setBackgroundColor('#0f0f13'); }
-
-function setVh() {
-  const vh = (tg?.viewportStableHeight || window.innerHeight);
-  document.body.style.height = vh + 'px';
-  document.body.style.maxHeight = vh + 'px';
-  fixStackHeight(vh);
+if (tg) {
+  tg.expand();
+  tg.disableVerticalSwipes();
+  tg.setHeaderColor('#0d0d11');
+  tg.setBackgroundColor('#0d0d11');
 }
 
-function fixStackHeight(vh) {
-  setTimeout(() => {
-    const navbar = document.querySelector('.navbar');
-    const swipeScreen = document.getElementById('screen-swipe');
-    if (!swipeScreen || !navbar) return;
-    const header = swipeScreen.querySelector('.swipe-header');
-    const filterBar = swipeScreen.querySelector('.filter-bar');
-    const actionBtns = swipeScreen.querySelector('.action-btns');
-    const navH = navbar.offsetHeight || 56;
-    const headerH = header ? header.offsetHeight : 56;
-    const filterH = filterBar ? filterBar.offsetHeight : 44;
-    const btnsH = actionBtns ? actionBtns.offsetHeight : 80;
-    const gap = 12;
-    const stackH = vh - navH - headerH - filterH - btnsH - gap;
-    const stackArea = document.getElementById('stack-area');
-    if (stackArea && stackH > 100) {
-      stackArea.style.height = stackH + 'px';
-      stackArea.style.maxHeight = stackH + 'px';
-      stackArea.style.flex = 'none';
-      stackArea.style.padding = '0 16px';
-    }
-  }, 200);
+function setVh() {
+  const vh = tg?.viewportStableHeight || window.innerHeight;
+  document.body.style.height = vh + 'px';
+  document.body.style.maxHeight = vh + 'px';
 }
 setVh();
 window.addEventListener('resize', setVh);
 if (tg) tg.onEvent('viewportChanged', setVh);
 
-const COLORS = ['#1b2838','#1a2a1a','#2a1a1a','#1a1a2a','#2a2a1a'];
-const EMOJIS = ['🔫','🎯','💥','⚡','🏆','🎮','👾','🦊'];
-
 const players = [
-  { id:0, name:'negr4ys', age:23, elo:1847, lvl:7, role:'Entry', mic:true, game:'Faceit', maps:['Mirage','Inferno','Dust2'], bio:'👑 Создатель CSFinder. Ищу адекватных тиммейтов без токсика. Играю вечером по МСК.', match:true, color:'#1a1400', emoji:'👑', hs:48, kd:1.25, isAdmin:true },
-  { id:1, name:'xSniper_kz', age:22, elo:2100, lvl:8, role:'AWPer', mic:true, game:'Faceit', maps:['Dust2','Inferno'], bio:'Ищу стабильную пятёрку на вечерние сессии. Не токсик, играю вдумчиво.', match:true, color:'#0f2a1a', emoji:'🎯', hs:52, kd:1.4 },
-  { id:2, name:'rush_B_only', age:19, elo:1350, lvl:5, role:'Entry', mic:true, game:'Premier', maps:['Mirage','Dust2'], bio:'Агрессивный стиль, люблю открывать раунды. Нужен саппорт в пару.', match:false, color:'#2a1a0f', emoji:'💥', hs:38, kd:1.1 },
-  { id:3, name:'SilentLurker', age:27, elo:1800, lvl:7, role:'Lurker', mic:false, game:'Faceit', maps:['Nuke','Ancient','Vertigo'], bio:'Calm, calculated. English is fine. Looking for serious 5-stack.', match:false, color:'#1a0f2a', emoji:'👾', hs:44, kd:1.3 },
-  { id:4, name:'FlashKing_77', age:24, elo:1650, lvl:6, role:'Support', mic:true, game:'Faceit', maps:['Inferno','Overpass'], bio:'Флэши, смоки, граты — моё всё. Ищу агрессивных fragg-еров для связки.', match:true, color:'#0f1a2a', emoji:'⚡', hs:29, kd:0.95 },
-  { id:5, name:'TacticalIGL', age:31, elo:2350, lvl:9, role:'IGL', mic:true, game:'Faceit', maps:['All карты'], bio:'Строю тактическую игру. Нужна команда для систематических тренировок.', match:false, color:'#1a1a0f', emoji:'🏆', hs:33, kd:1.15 },
-  { id:6, name:'PeekGod', age:20, elo:1500, lvl:6, role:'Entry', mic:true, game:'Premier', maps:['Anubis','Mirage'], bio:'Пикую всё что движется. Ищу тиммейтов на вечер по МСК.', match:true, color:'#2a0f1a', emoji:'🔫', hs:45, kd:1.2 },
-  { id:7, name:'d3adshot_ua', age:21, elo:1120, lvl:4, role:'AWPer', mic:true, game:'Faceit', maps:['Dust2','Mirage'], bio:'Hardstuck 4 lvl, но аим есть. Ищу терпеливых тиммейтов для роста.', match:false, color:'#2a1020', emoji:'🦊', hs:41, kd:0.88 },
-  { id:8, name:'CT_mastermind', age:26, elo:2600, lvl:10, role:'IGL', mic:true, game:'Faceit', maps:['Nuke','Inferno','Ancient'], bio:'Level 10, ищу игроков 8+ для стабильной пятёрки. Только серьёзные.', match:false, color:'#0a1a2a', emoji:'🔱', hs:31, kd:1.35 },
-  { id:9, name:'sprayNpray_lol', age:17, elo:820, lvl:3, role:'Entry', mic:false, game:'Matchmaking', maps:['Dust2'], bio:'Только начинаю, но стараюсь. Без mic пока что.', match:false, color:'#1a2a1a', emoji:'😅', hs:22, kd:0.71 },
+  { id:0, name:'negr4ys', age:23, elo:1847, lvl:7, role:'Entry', mic:true, game:'Faceit', maps:['Mirage','Inferno','Dust2'], time:'Вечер МСК', bio:'👑 Создатель CSFinder. Ищу адекватных тиммейтов без токсика.', match:true, color:'#1a1200', emoji:'👑', hs:48, kd:1.25, isAdmin:true },
+  { id:1, name:'xSniper_kz', age:22, elo:2100, lvl:8, role:'AWPer', mic:true, game:'Faceit', maps:['Dust2','Inferno'], time:'Вечер МСК', bio:'Ищу стабильную пятёрку. Не токсик, играю вдумчиво.', match:true, color:'#0a1f12', emoji:'🎯', hs:52, kd:1.4 },
+  { id:2, name:'rush_B_only', age:19, elo:1350, lvl:5, role:'Entry', mic:true, game:'Premier', maps:['Mirage','Dust2'], time:'Ночь', bio:'Агрессивный стиль, люблю открывать раунды. Нужен саппорт.', match:false, color:'#1f0f08', emoji:'💥', hs:38, kd:1.1 },
+  { id:3, name:'SilentLurker', age:27, elo:1800, lvl:7, role:'Lurker', mic:false, game:'Faceit', maps:['Nuke','Ancient'], time:'Вечер МСК', bio:'Calm, calculated. Looking for serious 5-stack.', match:false, color:'#100a1f', emoji:'👻', hs:44, kd:1.3 },
+  { id:4, name:'FlashKing_77', age:24, elo:1650, lvl:6, role:'Support', mic:true, game:'Faceit', maps:['Inferno','Overpass'], time:'Вечер МСК', bio:'Флэши, смоки, граты — моё всё. Ищу entry для связки.', match:true, color:'#081520', emoji:'⚡', hs:29, kd:0.95 },
+  { id:5, name:'TacticalIGL', age:31, elo:2350, lvl:9, role:'IGL', mic:true, game:'Faceit', maps:['Mirage','Inferno','Nuke'], time:'Выходные', bio:'Строю тактическую игру. Нужна команда для тренировок.', match:false, color:'#141408', emoji:'🧠', hs:33, kd:1.15 },
+  { id:6, name:'PeekGod', age:20, elo:1500, lvl:6, role:'Entry', mic:true, game:'Premier', maps:['Anubis','Mirage'], time:'Ночь', bio:'Пикую всё что движется. Ищу тиммейтов на вечер по МСК.', match:true, color:'#1f0810', emoji:'🔫', hs:45, kd:1.2 },
+  { id:7, name:'d3adshot_ua', age:21, elo:1120, lvl:4, role:'AWPer', mic:true, game:'Faceit', maps:['Dust2','Mirage'], time:'Вечер МСК', bio:'Hardstuck 4 lvl, но аим есть. Ищу терпеливых для роста.', match:false, color:'#1a0d18', emoji:'🦊', hs:41, kd:0.88 },
+  { id:8, name:'CT_mastermind', age:26, elo:2600, lvl:10, role:'IGL', mic:true, game:'Faceit', maps:['Nuke','Inferno','Ancient'], time:'Вечер МСК', bio:'Level 10. Ищу игроков 8+ для стабильной пятёрки. Только серьёзных.', match:false, color:'#061520', emoji:'🔱', hs:31, kd:1.35 },
+  { id:9, name:'sprayNpray', age:17, elo:820, lvl:3, role:'Entry', mic:false, game:'Matchmaking', maps:['Dust2'], time:'Ночь', bio:'Только начинаю, но стараюсь!', match:false, color:'#0d1a0d', emoji:'😅', hs:22, kd:0.71 },
 ];
 
 let queue = [...players];
-let activeFilter = 'all';
 let matches = [];
-let dragging = false, startX = 0, startY = 0, curX = 0;
-let topCardEl = null;
-let topPlayer = null;
+let activeFilter = 'all';
+let dragging = false, startX = 0, curX = 0;
+let topCardEl = null, topPlayer = null;
 
-function getFilteredQueue() {
-  return players.filter(p => {
-    if (activeFilter === 'all') return true;
-    if (activeFilter === 'mic') return p.mic;
-    if (activeFilter === 'Faceit') return p.game === 'Faceit';
-    if (activeFilter === 'Premier') return p.game === 'Premier';
-    return p.role === activeFilter;
-  });
+function buildCard(p, idx) {
+  const d = document.createElement('div');
+  d.className = `card c${idx}`;
+  const isPremiumLocked = !p.isAdmin && idx === 0;
+  d.innerHTML = `
+    <div class="card-bg" style="background:${p.color};">
+      <span style="font-size:110px;filter:drop-shadow(0 4px 24px rgba(0,0,0,0.5));">${p.emoji}</span>
+    </div>
+    <div class="card-bg-gradient"></div>
+    ${p.isAdmin ? '<div style="position:absolute;top:14px;left:14px;background:#f5a623;color:#000;border-radius:100px;padding:5px 12px;font-size:11px;font-weight:900;letter-spacing:0.05em;z-index:5;">👑 ADMIN</div>' : ''}
+    <div class="stamp stamp-like" id="sl-${p.id}">ЗОВУ</div>
+    <div class="stamp stamp-nope" id="sn-${p.id}">ПАС</div>
+    <div class="card-info">
+      <div class="card-name-row">
+        <span class="card-name">${p.name}</span>
+        <span class="card-age">${p.age}</span>
+        ${p.isAdmin ? '' : ''}
+      </div>
+      <div class="card-elo-row">
+        <div class="elo-badge">⭐ ${p.elo} ELO · Lvl ${p.lvl}</div>
+        <div class="platform-badge">${p.game}</div>
+      </div>
+      <div class="card-tags">
+        <span class="tag tag-role">${p.role}</span>
+        ${p.mic ? '<span class="tag tag-mic">🎤 Mic</span>' : '<span class="tag tag-nomic">🔇 Без mic</span>'}
+        <span class="tag tag-time">🌙 ${p.time}</span>
+        ${p.maps.slice(0,2).map(m => `<span class="tag tag-map">${m}</span>`).join('')}
+      </div>
+      <div class="card-bio">${p.bio}</div>
+      <div class="premium-lock" style="position:relative;">
+        <div class="card-stats ${isPremiumLocked ? 'stat-locked' : ''}">
+          <div class="stat-item"><div class="stat-val" style="color:var(--gold)">${p.hs}%</div><div class="stat-lbl">HS%</div></div>
+          <div class="stat-item"><div class="stat-val" style="color:var(--blue)">${p.kd}</div><div class="stat-lbl">K/D</div></div>
+          <div class="stat-item"><div class="stat-val" style="color:var(--green)">${p.lvl}</div><div class="stat-lbl">Lvl</div></div>
+        </div>
+        ${isPremiumLocked ? '<div class="premium-lock-badge">⭐ Premium</div>' : ''}
+      </div>
+    </div>
+  `;
+  return d;
 }
 
 function renderStack() {
   const area = document.getElementById('stack-area');
-  const cards = area.querySelectorAll('.card');
-  cards.forEach(c => c.remove());
-
-  const filtered = queue.filter(p => {
-    if (activeFilter === 'all') return true;
-    if (activeFilter === 'mic') return p.mic;
-    if (activeFilter === 'Faceit') return p.game === 'Faceit';
-    if (activeFilter === 'Premier') return p.game === 'Premier';
-    return p.role === activeFilter;
-  });
-
+  area.querySelectorAll('.card').forEach(c => c.remove());
+  const filtered = getFiltered();
   document.getElementById('empty-state').style.display = filtered.length === 0 ? 'flex' : 'none';
-  if (filtered.length === 0) return;
-
+  if (!filtered.length) return;
   for (let i = Math.min(filtered.length - 1, 2); i >= 0; i--) {
     const card = buildCard(filtered[i], i);
     area.appendChild(card);
@@ -387,52 +636,23 @@ function renderStack() {
   }
 }
 
-function buildCard(p, idx) {
-  const isPremium = !false;
-  const d = document.createElement('div');
-  d.className = `card c${idx}`;
-  d.innerHTML = `
-    <div class="card-inner">
-      <div class="card-avatar-area" style="background:${p.color};">
-        <span style="font-size:72px;">${p.emoji}</span>
-        ${p.isAdmin ? '<div style="position:absolute;top:12px;right:12px;background:#f5a623;color:#000;border-radius:100px;padding:4px 10px;font-size:11px;font-weight:800;letter-spacing:0.05em;">👑 ADMIN</div>' : ''}
-        <div class="stamp stamp-like" id="sl-${p.id}">ЗОВУ</div>
-        <div class="stamp stamp-nope" id="sn-${p.id}">ПАС</div>
-      </div>
-      <div class="card-body">
-        <div class="card-name-row">
-          <div class="card-name">${p.name}</div>
-          <div class="card-age">${p.age} лет</div>
-        </div>
-        <div class="elo-row">
-          <div class="elo-badge">⭐ ${p.elo} ELO · Lvl ${p.lvl}</div>
-          <div class="game-badge">${p.game}</div>
-        </div>
-        <div class="tags">
-          <span class="tag tag-role">${p.role}</span>
-          ${p.mic ? '<span class="tag tag-mic">🎤 Mic</span>' : '<span class="tag tag-nomic">🔇 Без mic</span>'}
-          ${p.maps.map(m => `<span class="tag tag-map">${m}</span>`).join('')}
-        </div>
-        <div class="card-bio">${p.bio}</div>
-        <div class="premium-overlay" style="position:relative;">
-          <div class="stats-grid ${isPremium ? 'premium-blur' : ''}">
-            <div class="stat-box"><div class="stat-label">HS%</div><div class="stat-val" style="color:var(--gold)">${p.hs}%</div></div>
-            <div class="stat-box"><div class="stat-label">K/D</div><div class="stat-val" style="color:var(--blue)">${p.kd}</div></div>
-          </div>
-          ${isPremium ? '<div class="premium-label">⭐ Premium</div>' : ''}
-        </div>
-      </div>
-    </div>
-  `;
-  return d;
+function getFiltered() {
+  return queue.filter(p => {
+    if (activeFilter === 'all') return true;
+    if (activeFilter === 'mic') return p.mic;
+    if (activeFilter === 'Faceit') return p.game === 'Faceit';
+    if (activeFilter === 'Premier') return p.game === 'Premier';
+    if (activeFilter === 'evening') return p.time === 'Вечер МСК';
+    return p.role === activeFilter;
+  });
 }
 
 function setupDrag(card, player) {
-  const onStart = (x, y) => { dragging = true; startX = x; startY = y; curX = 0; card.style.transition = 'none'; };
+  const onStart = (x) => { dragging = true; startX = x; curX = 0; card.style.transition = 'none'; };
   const onMove = (x) => {
     if (!dragging) return;
     curX = x - startX;
-    card.style.transform = `translateX(${curX}px) rotate(${curX * 0.06}deg)`;
+    card.style.transform = `translateX(${curX}px) rotate(${curX * 0.05}deg)`;
     const sl = document.getElementById('sl-' + player.id);
     const sn = document.getElementById('sn-' + player.id);
     if (sl) sl.style.opacity = curX > 20 ? Math.min((curX - 20) / 60, 1) : 0;
@@ -443,10 +663,10 @@ function setupDrag(card, player) {
     dragging = false;
     if (curX > 80) doSwipe('right', player);
     else if (curX < -80) doSwipe('left', player);
-    else { card.style.transition = 'transform 0.4s'; card.style.transform = ''; resetStamps(player); }
+    else { card.style.transition = 'transform 0.4s cubic-bezier(0.175,0.885,0.32,1.275)'; card.style.transform = ''; resetStamps(player); }
   };
-  card.addEventListener('mousedown', e => onStart(e.clientX, e.clientY));
-  card.addEventListener('touchstart', e => { e.stopPropagation(); onStart(e.touches[0].clientX, e.touches[0].clientY); }, { passive: false });
+  card.addEventListener('mousedown', e => onStart(e.clientX));
+  card.addEventListener('touchstart', e => { e.stopPropagation(); onStart(e.touches[0].clientX); }, { passive: false });
   document.addEventListener('mousemove', e => onMove(e.clientX));
   document.addEventListener('touchmove', e => { e.preventDefault(); onMove(e.touches[0].clientX); }, { passive: false });
   document.addEventListener('mouseup', onEnd);
@@ -463,26 +683,34 @@ function resetStamps(p) {
 function doSwipe(dir, player) {
   if (!topCardEl) return;
   const card = topCardEl;
-  const tx = dir === 'right' ? 600 : -600;
+  const tx = dir === 'right' ? 700 : -700;
   const sl = document.getElementById('sl-' + player.id);
   const sn = document.getElementById('sn-' + player.id);
   if (dir === 'right' && sl) sl.style.opacity = 1;
   if (dir === 'left' && sn) sn.style.opacity = 1;
   card.style.transition = 'transform 0.35s ease';
-  card.style.transform = `translateX(${tx}px) rotate(${dir === 'right' ? 25 : -25}deg)`;
-
+  card.style.transform = `translateX(${tx}px) rotate(${dir === 'right' ? 20 : -20}deg)`;
   queue = queue.filter(p => p.id !== player.id);
-
-  if (dir === 'right' && player.match) {
-    setTimeout(() => { card.remove(); showMatchPopup(player); }, 300);
+  if (dir === 'right') {
+    matches.push(player);
+    if (player.match) setTimeout(() => { card.remove(); showMatchPopup(player); }, 300);
+    else setTimeout(() => { card.remove(); renderStack(); }, 350);
   } else {
     setTimeout(() => { card.remove(); renderStack(); }, 350);
   }
+}
 
-  if (dir === 'right') {
-    matches.push(player);
-    updateMatchesBadge();
+function superLike() {
+  if (!topPlayer) return;
+  if (topCardEl) {
+    topCardEl.style.transition = 'transform 0.4s ease';
+    topCardEl.style.transform = 'translateY(-700px)';
   }
+  matches.push(topPlayer);
+  const p = topPlayer;
+  queue = queue.filter(x => x.id !== p.id);
+  if (p.match) setTimeout(() => { if (topCardEl) topCardEl.remove(); showMatchPopup(p); }, 350);
+  else setTimeout(() => { if (topCardEl) topCardEl.remove(); renderStack(); }, 400);
 }
 
 function swipeRight() { if (topPlayer) doSwipe('right', topPlayer); }
@@ -490,8 +718,7 @@ function swipeLeft() { if (topPlayer) doSwipe('left', topPlayer); }
 
 function showMatchPopup(player) {
   document.getElementById('popup-av').textContent = player.emoji;
-  document.getElementById('popup-av').style.background = player.color;
-  document.getElementById('popup-sub').textContent = `Ты и ${player.name} подходите друг другу`;
+  document.getElementById('popup-sub').textContent = `Ты и ${player.name} подошли друг другу`;
   document.getElementById('match-popup').classList.add('show');
 }
 
@@ -501,17 +728,15 @@ function closeMatch() {
   renderMatches();
 }
 
-function updateMatchesBadge() {}
-
 function renderMatches() {
   const list = document.getElementById('matches-list');
-  if (matches.length === 0) {
-    list.innerHTML = '<div style="color:var(--muted);font-size:14px;text-align:center;padding:40px 0;">Пока нет матчей — свайпай вправо!</div>';
+  if (!matches.length) {
+    list.innerHTML = '<div style="color:var(--muted);font-size:14px;text-align:center;padding:40px 0;">Свайпай вправо чтобы найти тиммейта!</div>';
     return;
   }
   list.innerHTML = matches.map(p => `
     <div class="match-item">
-      <div class="match-item-av" style="background:${p.color};">${p.emoji}</div>
+      <div class="match-item-av">${p.emoji}</div>
       <div class="match-item-info">
         <div class="match-item-name">${p.name}</div>
         <div class="match-item-sub">${p.elo} ELO · ${p.role} · ${p.game}</div>
@@ -521,10 +746,7 @@ function renderMatches() {
   `).join('');
 }
 
-function resetDeck() {
-  queue = [...players];
-  renderStack();
-}
+function resetDeck() { queue = [...players]; renderStack(); }
 
 function showScreen(name, btn) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
@@ -535,19 +757,13 @@ function showScreen(name, btn) {
 }
 
 function connectSteam() {
-  if (tg) tg.showAlert('Steam авторизация будет доступна после подключения Steam API ключа. Добавь STEAM_API_KEY в Vercel Environment Variables.');
-  else alert('Steam авторизация: добавь STEAM_API_KEY в Vercel Environment Variables');
+  if (tg) tg.showAlert('Steam авторизация будет доступна после добавления STEAM_API_KEY в Vercel!');
+  else alert('Добавь STEAM_API_KEY в Vercel Environment Variables');
 }
 
-function saveProfile() {
-  if (tg) tg.showAlert('Профиль сохранён!');
-  else alert('Профиль сохранён!');
-}
-
-function showPremium() {
-  if (tg) tg.showAlert('Оплата через Telegram Stars — подключим после запуска!');
-  else alert('Оплата через Telegram Stars!');
-}
+document.querySelectorAll('.choice-chip').forEach(chip => {
+  chip.addEventListener('click', () => chip.classList.toggle('selected'));
+});
 
 document.querySelectorAll('.filter-chip').forEach(chip => {
   chip.addEventListener('click', () => {
