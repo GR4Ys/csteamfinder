@@ -173,7 +173,7 @@
     <div class="filter-chip" data-filter="IGL">IGL</div>
   </div>
 
-  <div class="stack-area" id="stack-area">
+  <div class="stack-area" id="stack-area" ontouchmove="event.preventDefault()" style="touch-action:none;">
     <div class="empty-state" id="empty-state" style="display:none;">
       <div class="empty-icon">🎯</div>
       <div class="empty-text">Все игроки просмотрены</div>
@@ -446,9 +446,9 @@ function setupDrag(card, player) {
     else { card.style.transition = 'transform 0.4s'; card.style.transform = ''; resetStamps(player); }
   };
   card.addEventListener('mousedown', e => onStart(e.clientX, e.clientY));
-  card.addEventListener('touchstart', e => onStart(e.touches[0].clientX, e.touches[0].clientY), { passive: true });
+  card.addEventListener('touchstart', e => { e.stopPropagation(); onStart(e.touches[0].clientX, e.touches[0].clientY); }, { passive: false });
   document.addEventListener('mousemove', e => onMove(e.clientX));
-  document.addEventListener('touchmove', e => onMove(e.touches[0].clientX), { passive: true });
+  document.addEventListener('touchmove', e => { e.preventDefault(); onMove(e.touches[0].clientX); }, { passive: false });
   document.addEventListener('mouseup', onEnd);
   document.addEventListener('touchend', onEnd);
 }
